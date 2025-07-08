@@ -1,7 +1,9 @@
+import { Button } from "@/components/ui/button";
+
 export default function Home() {
   return (
-    <div >
-     Hello world
-    </div>
+    <Button className=" flex justify-center bg-black " >
+      Click Me
+    </Button>
   );
 }
