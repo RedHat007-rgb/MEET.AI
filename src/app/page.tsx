@@ -1,54 +1,50 @@
 "use client";
-
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { authClient } from "@/db/auth-client";
-import { useState } from "react";
+// import { error } from "console";
+
+import { useRef, useState } from "react";
+import { Session } from "better-auth";
 
 export default function Home() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
+  const loginEmailRef = useRef<HTMLInputElement>(null);
+  const loginPasswordRef = useRef<HTMLInputElement>(null);
+  const [data, setData] = useState<Session>();
+  // const router = router();
 
-  const signUp = () => {
-    authClient.signUp.email({
-      email,
-      password,
-      name,
-    });
-  };
+  const onLogin = async () => {
+    const email = loginEmailRef.current?.value || "";
+    const password = loginPasswordRef.current?.value || "";
 
-  const submitHandler = async () => {
-    await signUp();
-    // console.log(response);
+    const { data } = await authClient.signIn.email(
+      {
+        email,
+        password,
+      },
+      {
+        onSuccess: async (ctx) => {
+          // console.log(ctx);
+          await setData(ctx.data);
+        },
+      }
+    );
   };
+  if (data) {
+    return <div>{/* <CoursesPage data={data} /> */}</div>;
+  }
+
+  // console.log(data);
 
   return (
-    <form onSubmit={submitHandler}>
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => {
-          setEmail(e.target.value);
-        }}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => {
-          setPassword(e.target.value);
-        }}
-      />
-      <input
-        type="name"
-        value={name}
-        placeholder="Name"
-        onChange={(e) => {
-          setName(e.target.value);
-        }}
-      />
-      <Button type="submit">Submit</Button>
-    </form>
+    <div>
+      <div>
+        <Input placeholder="email" ref={loginEmailRef}></Input>
+        <br />
+        <Input placeholder="password" ref={loginPasswordRef}></Input>
+        <br />
+        <Button onClick={onLogin}>Login</Button>
+      </div>
+    </div>
   );
 }
